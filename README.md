@@ -36,7 +36,7 @@ Follow the GT debugger user experience (but simplified).
    - No filtering.
 1. Code Presenter:
    - With highlight (otherwise we don't know what are we executing).
-   - Initially, we will use SpPresenter as it comes.
+   - Initially, we will use SpCodePresenter as it comes.
 1. Inspector:
    - Failsafe if needed (if it crashes on update or loading, then nothing is shown, but the debugger doesnt break, ever).
    - One mode only (not like the inspector for failing test cases).
