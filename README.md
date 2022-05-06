@@ -29,7 +29,7 @@ Follow the GT debugger user experience (but simplified).
 ### UI Components:
 
 1. Toolbar: almost copy the one from GT Debugger.
-   Restart, Over, Into, Proceed, Through
+   Proceed, Restart, Into, Over, Through
 1. StackTable:
    - We want it:.
    - No Context Menu commands.
