@@ -5,7 +5,7 @@ A debugger for Pharo 11, but fail-safe :^)
 ## Why we need this?
 
 Working in anything used by StDebugger initialization means that we lose the ability to debug those changes.
-This means:
+This means the we can't use:
 
 - No breakpoints.
 - No stepping*.
