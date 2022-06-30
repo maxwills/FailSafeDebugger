@@ -2,7 +2,8 @@ Class {
 	#name : #FailSafeDebugSession,
 	#superclass : #Object,
 	#instVars : [
-		'suspendedProcess'
+		'suspendedProcess',
+		'suspendedContext'
 	],
 	#category : #'FailSafeDebugger-Core'
 }
@@ -39,18 +40,17 @@ FailSafeDebugSession >> stepInto [
 ]
 
 { #category : #actions }
+FailSafeDebugSession >> stepInto: aContext [
+
+	"will this work?"
+
+	suspendedProcess step: aContext
+]
+
+{ #category : #actions }
 FailSafeDebugSession >> stepOver [
 
-	| newContext aContext |
-	aContext := self context.
-	(self isContextPostMortem: aContext) ifTrue: [ ^ self ].
-
-	newContext := suspendedProcess completeStep: aContext.
-
-	newContext == aContext
-		ifTrue: [ 
-		self privateStepToFirstInterestingBytecodeIn: suspendedProcess ]
-		ifFalse: [ newContext ]
+	self stepOver: suspendedContext 
 ]
 
 { #category : #actions }
@@ -61,8 +61,35 @@ FailSafeDebugSession >> stepOver: aContext [
 
 	newContext := suspendedProcess completeStep: aContext.
 
-	newContext == aContext
-		ifTrue: [ 
-		self privateStepToFirstInterestingBytecodeIn: suspendedProcess ]
-		ifFalse: [ newContext ]
+	self updateContextTo: (newContext == aContext
+			 ifTrue: [ 
+			 self privateStepToFirstInterestingBytecodeIn: suspendedProcess ]
+			 ifFalse: [ newContext ])
+]
+
+{ #category : #actions }
+FailSafeDebugSession >> stepThrough [
+
+	self stepThrough: suspendedContext 
+]
+
+{ #category : #actions }
+FailSafeDebugSession >> stepThrough: aContext [
+
+	(self isContextPostMortem: aContext) ifTrue: [^ self].
+	
+	suspendedProcess stepToHome: aContext.
+	self updateContextTo: (self privateStepToFirstInterestingBytecodeIn: suspendedProcess)
+]
+
+{ #category : #accessing }
+FailSafeDebugSession >> suspendedContext [
+
+	^ suspendedContext
+]
+
+{ #category : #accessing }
+FailSafeDebugSession >> updateContextTo: aContext [
+
+	suspendedContext := aContext
 ]

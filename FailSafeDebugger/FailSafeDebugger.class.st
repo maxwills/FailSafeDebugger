@@ -11,7 +11,7 @@ Class {
 	#category : #'FailSafeDebugger-UI'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #'presenter - code' }
 FailSafeDebugger >> createCode [
 
 	^ self newCode
@@ -45,10 +45,24 @@ FailSafeDebugger >> initializePresenters [
 	self initializeLayout
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #actions }
 FailSafeDebugger >> stepIntoClicked [
 
 	fsDebugSession stepInto.
+	self updateUI
+]
+
+{ #category : #actions }
+FailSafeDebugger >> stepOverClicked [
+
+	fsDebugSession stepOver.
+	self updateUI
+]
+
+{ #category : #actions }
+FailSafeDebugger >> stepThroughClicked [
+
+	fsDebugSession stepThrough.
 	self updateUI
 ]
 
