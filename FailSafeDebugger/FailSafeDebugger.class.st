@@ -36,9 +36,16 @@ FailSafeDebugger class >> debugSession: aDebugSession [
 ]
 
 { #category : #'initialize-release' }
+FailSafeDebugger >> clear [
+
+	self fsDebugSession clear
+]
+
+{ #category : #'initialize-release' }
 FailSafeDebugger >> close [
 
-	"not yet implemented"
+	[ self withWindowDo: #close ] ensure: [ 
+		self fsDebugSession ifNotNil: [ :session | session clear ] ]
 ]
 
 { #category : #accessing }
