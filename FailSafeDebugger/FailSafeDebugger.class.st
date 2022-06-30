@@ -18,6 +18,38 @@ FailSafeDebugger >> createCode [
 ]
 
 { #category : #initialization }
+FailSafeDebugger >> createToolbar [
+
+	^ self newToolbar
+		  addItem: (self newToolbarButton
+				   label: 'Proceed';
+				   icon: (self iconNamed: #glamorousGo);
+				   action: [ self proceedClicked ];
+				   yourself);
+		  addItem: (self newToolbarButton
+				   label: 'Restart';
+				   icon: (self iconNamed: #glamorousRestart);
+				   action: [ self restartClicked ];
+				   yourself);
+		  addItem: (self newToolbarButton
+				   label: 'stepInto';
+				   icon: (self iconNamed: #glamorousDown);
+				   action: [ self stepIntoClicked ];
+				   yourself);
+		  addItem: (self newToolbarButton
+				   label: 'stepOver';
+				   icon: (self iconNamed: #glamorousRight);
+				   action: [ self stepOverClicked ];
+				   yourself);
+		  addItem: (self newToolbarButton
+				   label: 'stepThrough';
+				   icon: (self iconNamed: #glamorousThrough);
+				   action: [ self stepThroughClicked ];
+				   yourself);
+		  yourself
+]
+
+{ #category : #initialization }
 FailSafeDebugger >> initialize [
 
 	super initialize.
@@ -41,8 +73,20 @@ FailSafeDebugger >> initializePresenters [
 	code := self createCode.
 	stackTable := self newTable.
 	inspector := StInspector on: nil.
-	toolbar := self newToolbar.
+	toolbar := self createToolbar.
 	self initializeLayout
+]
+
+{ #category : #actions }
+FailSafeDebugger >> proceedClicked [
+
+	self error: 'not yet implemented'
+]
+
+{ #category : #actions }
+FailSafeDebugger >> restartClicked [
+
+	self error: 'not yet implemented'
 ]
 
 { #category : #actions }
