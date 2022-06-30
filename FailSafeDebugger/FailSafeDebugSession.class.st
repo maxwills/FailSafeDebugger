@@ -17,6 +17,13 @@ FailSafeDebugSession class >> named: aString on: aProcess startedAt: aContext [
 		  process: aProcess context: aContext
 ]
 
+{ #category : #actions }
+FailSafeDebugSession >> clear [
+
+	suspendedProcess := nil.
+	self updateContextTo: nil
+]
+
 { #category : #testing }
 FailSafeDebugSession >> isContextPostMortem: aContext [
 ]

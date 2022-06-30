@@ -167,6 +167,16 @@ FailSafeDebugger >> initializePresenters [
 	self initializeLayout
 ]
 
+{ #category : #initialization }
+FailSafeDebugger >> initializeWindow: aWindowPresenter [
+
+	super initializeWindow: aWindowPresenter.
+	aWindowPresenter
+		title: self context printString;
+		initialExtent: self initialExtent;
+		whenClosedDo: [ self clear ]
+]
+
 { #category : #printing }
 FailSafeDebugger >> printReceiverClassInContext: aContext [
 
