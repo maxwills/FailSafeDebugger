@@ -1,6 +1,8 @@
 Class {
 	#name : #FailSafeDebugger,
 	#superclass : #SpPresenter,
+	#traits : 'TDebugger',
+	#classTraits : 'TDebugger classTrait',
 	#instVars : [
 		'fsDebugSession',
 		'code',
@@ -10,6 +12,27 @@ Class {
 	],
 	#category : #'FailSafeDebugger-UI'
 }
+
+{ #category : #'instance creation' }
+FailSafeDebugger class >> debugSession: aDebugSession [
+
+	| fsDebugSession debugger |
+	"OupsDebugRequest calls this method with a debug session. So, if we want to use an fsDebugSession, we have to convert it"
+	fsDebugSession := FailSafeDebugSession
+		                  named: aDebugSession name
+		                  on: aDebugSession interruptedProcess
+		                  startedAt: aDebugSession interruptedContext.
+	debugger := self on: fsDebugSession.
+	debugger open.
+
+	^ debugger
+]
+
+{ #category : #accessing }
+FailSafeDebugger >> context [
+
+	^ self fsDebugSession suspendedContext 
+]
 
 { #category : #'presenter - code' }
 FailSafeDebugger >> createCode [
@@ -49,6 +72,19 @@ FailSafeDebugger >> createToolbar [
 		  yourself
 ]
 
+{ #category : #accessing }
+FailSafeDebugger >> fsDebugSession [
+
+	^ fsDebugSession 
+]
+
+{ #category : #accessing }
+FailSafeDebugger >> fsDebugSession: aFsDebugSession [
+
+	fsDebugSession := aFsDebugSession.
+	self updateStackFromSession: fsDebugSession
+]
+
 { #category : #initialization }
 FailSafeDebugger >> initialize [
 
@@ -71,10 +107,27 @@ FailSafeDebugger >> initializeLayout [
 FailSafeDebugger >> initializePresenters [
 
 	code := self createCode.
-	stackTable := self newTable.
+	stackTable := self createStack.
+	self updateStackFromSession: self fsDebugSession.
 	inspector := StInspector on: nil.
 	toolbar := self createToolbar.
 	self initializeLayout
+]
+
+{ #category : #printing }
+FailSafeDebugger >> printReceiverClassInContext: aContext [
+
+	| receiverClass methodClass |
+	receiverClass := aContext receiver class.
+	methodClass := aContext method methodClass.
+	receiverClass == methodClass ifTrue: [ ^ receiverClass name ].
+	^ (WriteStream on: String new)
+		  nextPutAll: receiverClass name;
+		  space;
+		  nextPut: $(;
+		  nextPutAll: methodClass name;
+		  nextPut: $);
+		  contents
 ]
 
 { #category : #actions }
@@ -87,6 +140,30 @@ FailSafeDebugger >> proceedClicked [
 FailSafeDebugger >> restartClicked [
 
 	self error: 'not yet implemented'
+]
+
+{ #category : #accessing }
+FailSafeDebugger >> selectedContext [
+
+	^ self stackTable selection selected item
+]
+
+{ #category : #initialization }
+FailSafeDebugger >> setModelBeforeInitialization: anFsDebugSession [
+
+	self fsDebugSession: anFsDebugSession
+]
+
+{ #category : #accessing }
+FailSafeDebugger >> stack [
+
+	^ self context stack
+]
+
+{ #category : #accessing }
+FailSafeDebugger >> stackTable [
+
+	^ stackTable
 ]
 
 { #category : #actions }
@@ -113,19 +190,44 @@ FailSafeDebugger >> stepThroughClicked [
 { #category : #updating }
 FailSafeDebugger >> updateCode [
 
-	self error: 'not implmenented'
+	"not implemented"
+]
+
+{ #category : #'presenter - code' }
+FailSafeDebugger >> updateCodeFromContext: aContext [
+
+	"not yet implemented"
+
+	
 ]
 
 { #category : #updating }
 FailSafeDebugger >> updateInspector [
 
-	self error: 'not implmenented'
+	self updateInspectorFromContext: self selectedContext
+]
+
+{ #category : #'updating - widgets' }
+FailSafeDebugger >> updateInspectorFromContext: aContext [
+
+	"not yet implemented"
+
+	
+]
+
+{ #category : #accessing }
+FailSafeDebugger >> updateStackFromSession: aFsDebugSession [
+
+	stackTable ifNotNil: [ :stack | 
+		stack
+			items: aFsDebugSession stack;
+			selectIndex: 1 scrollToSelection: true ]
 ]
 
 { #category : #updating }
 FailSafeDebugger >> updateStackTable [
 
-	self error: 'not implmenented'
+	self updateStackFromSession: self fsDebugSession
 ]
 
 { #category : #updating }

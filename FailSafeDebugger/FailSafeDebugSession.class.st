@@ -2,14 +2,35 @@ Class {
 	#name : #FailSafeDebugSession,
 	#superclass : #Object,
 	#instVars : [
+		'name',
 		'suspendedProcess',
 		'suspendedContext'
 	],
 	#category : #'FailSafeDebugger-Core'
 }
 
+{ #category : #accessing }
+FailSafeDebugSession class >> named: aString on: aProcess startedAt: aContext [
+
+	^ self new
+		  name: aString;
+		  process: aProcess context: aContext
+]
+
 { #category : #testing }
 FailSafeDebugSession >> isContextPostMortem: aContext [
+]
+
+{ #category : #accessing }
+FailSafeDebugSession >> name [
+
+	^ name
+]
+
+{ #category : #accessing }
+FailSafeDebugSession >> name: anObject [
+
+	name := anObject
 ]
 
 { #category : #private }
@@ -29,6 +50,19 @@ FailSafeDebugSession >> privateStepToFirstInterestingBytecodeIn: aProcess [
 		ifTrue: [ ^ suspendedContext updatePCForQuickPrimitiveRestart ].
 	
 	^ aProcess stepToSendOrReturn
+]
+
+{ #category : #initialization }
+FailSafeDebugSession >> process: aProcess context: aContext [
+
+	suspendedProcess := aProcess.
+	suspendedContext ifNil: [ suspendedContext := aContext ]
+]
+
+{ #category : #accessing }
+FailSafeDebugSession >> stack [
+
+	^ suspendedContext stack
 ]
 
 { #category : #actions }
