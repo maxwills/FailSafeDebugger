@@ -13,6 +13,13 @@ Class {
 	#category : #'FailSafeDebugger-UI'
 }
 
+{ #category : #utilities }
+FailSafeDebugger class >> closeAllDebuggers [
+
+	<script>
+	FailSafeDebugger allInstancesDo: [ :dbg | dbg close ]
+]
+
 { #category : #'instance creation' }
 FailSafeDebugger class >> debugSession: aDebugSession [
 
@@ -28,6 +35,12 @@ FailSafeDebugger class >> debugSession: aDebugSession [
 	^ debugger
 ]
 
+{ #category : #'initialize-release' }
+FailSafeDebugger >> close [
+
+	"not yet implemented"
+]
+
 { #category : #accessing }
 FailSafeDebugger >> context [
 
@@ -38,6 +51,39 @@ FailSafeDebugger >> context [
 FailSafeDebugger >> createCode [
 
 	^ self newCode
+]
+
+{ #category : #initialization }
+FailSafeDebugger >> createStack [
+
+	^ self newTable
+		  addColumn: ((SpStringTableColumn
+				    title: 'Class'
+				    evaluated: [ :item | self printReceiverClassInContext: item ])
+				   sortFunction: nil;
+				   yourself);
+		  addColumn:
+			  ((SpStringTableColumn title: 'Method' evaluated: [ :item | 
+					    | method |
+					    method := item method.
+					    method isCompiledBlock
+						    ifTrue: [ method sourceNode sourceCode ]
+						    ifFalse: [ method selector ] ])
+				   sortFunction: nil;
+				   yourself);
+		  addColumn:
+			  ((SpStringTableColumn title: 'Package' evaluated: [ :item | 
+					    | package |
+					    package := item method package.
+					    package ifNil: [ '-' ] ifNotNil: [ package name asString ] ])
+				   sortFunction: nil;
+				   yourself);
+		  transmitDo: [ :context | 
+			  stackTable selection isEmpty ifFalse: [ 
+				  self updateInspectorFromContext: context.
+				  self updateCodeFromContext: context.
+				  "self updateWindowTitle" ] ];
+		  yourself
 ]
 
 { #category : #initialization }
