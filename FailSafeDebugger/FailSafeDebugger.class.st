@@ -144,6 +144,17 @@ FailSafeDebugger >> fsDebugSession: aFsDebugSession [
 	self updateStackFromSession: fsDebugSession
 ]
 
+{ #category : #'morphic ui' }
+FailSafeDebugger >> initialExtent [ 
+	
+	^ [ | w h |
+		w := Display width.
+		h := Display height.
+		(w - (w // 3)) @ (h - (h // 5)) ]
+		on: Error
+		do: [ 850@650 ]
+]
+
 { #category : #initialization }
 FailSafeDebugger >> initialize [
 
@@ -156,7 +167,7 @@ FailSafeDebugger >> initializeLayout [
 
 	self layout: (SpBoxLayout newVertical
 			 add: stackTable;
-			 add: toolbar;
+			 add: toolbar expand: false;
 			 add: code;
 			 add: inspector;
 			 yourself)
