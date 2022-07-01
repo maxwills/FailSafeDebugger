@@ -208,7 +208,7 @@ FailSafeDebugger >> restartClicked [
 { #category : #accessing }
 FailSafeDebugger >> selectedContext [
 
-	^ self stackTable selection selected item
+	^ self stackTable selectedItem
 ]
 
 { #category : #initialization }
