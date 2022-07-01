@@ -60,6 +60,12 @@ FailSafeDebugger >> createCode [
 	^ self newCode
 ]
 
+{ #category : #'presenter - code' }
+FailSafeDebugger >> createInspector [
+	"maybe we will remove it later. I just don't know right now how to have a similar inspector more easily, without relying on StDebuggerContext"
+	^ StRawInspection on: (StDebuggerContext context: self selectedContext)
+]
+
 { #category : #initialization }
 FailSafeDebugger >> createStack [
 
@@ -162,7 +168,7 @@ FailSafeDebugger >> initializePresenters [
 	code := self createCode.
 	stackTable := self createStack.
 	self updateStackFromSession: self fsDebugSession.
-	inspector := StInspector on: nil.
+	inspector := self createInspector.
 	toolbar := self createToolbar.
 	self initializeLayout
 ]
@@ -273,9 +279,8 @@ FailSafeDebugger >> updateInspector [
 { #category : #'updating - widgets' }
 FailSafeDebugger >> updateInspectorFromContext: aContext [
 
-	"not yet implemented"
-
-	
+	inspector ifNotNil: [ 
+		inspector model: (StRawInspection on: aContext) ]
 ]
 
 { #category : #accessing }
