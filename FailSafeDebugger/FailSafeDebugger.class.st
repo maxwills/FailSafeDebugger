@@ -62,8 +62,13 @@ FailSafeDebugger >> createCode [
 
 { #category : #'presenter - code' }
 FailSafeDebugger >> createInspector [
+
 	"maybe we will remove it later. I just don't know right now how to have a similar inspector more easily, without relying on StDebuggerContext"
-	^ StRawInspection on: (StDebuggerContext context: self selectedContext)
+
+	^ (StRawInspection
+		  on: (FsDebuggerContext context: self selectedContext) "self selectedContext")
+		  beForDebugger;
+		  yourself
 ]
 
 { #category : #initialization }
@@ -291,7 +296,7 @@ FailSafeDebugger >> updateInspector [
 FailSafeDebugger >> updateInspectorFromContext: aContext [
 
 	inspector ifNotNil: [ 
-		inspector model: (StRawInspection on: aContext) ]
+		inspector model: (FsDebuggerContext context: aContext) ]
 ]
 
 { #category : #accessing }
