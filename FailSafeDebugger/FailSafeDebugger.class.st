@@ -87,6 +87,7 @@ FailSafeDebugger >> createInspector [
 FailSafeDebugger >> createStack [
 
 	^ self newTable
+		  beResizable;
 		  addColumn: ((SpStringTableColumn
 				    title: 'Class'
 				    evaluated: [ :item | self printReceiverClassInContext: item ])
@@ -111,7 +112,7 @@ FailSafeDebugger >> createStack [
 		  transmitDo: [ :context | 
 			  stackTable selection isEmpty ifFalse: [ 
 				  self updateInspectorFromContext: context.
-				  self updateCodeFromContext: context.
+				  self updateCodeFromContext: context
 				  "self updateWindowTitle" ] ];
 		  yourself
 ]
