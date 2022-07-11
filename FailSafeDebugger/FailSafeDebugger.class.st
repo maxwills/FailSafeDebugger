@@ -271,22 +271,22 @@ FailSafeDebugger >> stackTable [
 
 { #category : #actions }
 FailSafeDebugger >> stepIntoClicked [
-
-	fsDebugSession stepInto.
+	
+	fsDebugSession stepInto: self selectedContext.
 	self updateUI
 ]
 
 { #category : #actions }
 FailSafeDebugger >> stepOverClicked [
 
-	fsDebugSession stepOver.
+	fsDebugSession stepOver: self selectedContext.
 	self updateUI
 ]
 
 { #category : #actions }
 FailSafeDebugger >> stepThroughClicked [
 
-	fsDebugSession stepThrough.
+	fsDebugSession stepThrough: self selectedContext.
 	self updateUI
 ]
 

@@ -26,6 +26,12 @@ FailSafeDebugSession >> clear [
 
 { #category : #testing }
 FailSafeDebugSession >> isContextPostMortem: aContext [
+
+	"return whether we're inspecting a frozen exception without a process attached"
+	| interruptedContext |
+	interruptedContext := suspendedProcess suspendedContext.
+	interruptedContext ifNil: [ ^ false ].
+	^ (interruptedContext hasContext: aContext) not.
 ]
 
 { #category : #'updating - actions' }
@@ -57,10 +63,10 @@ FailSafeDebugSession >> privateStepToFirstInterestingBytecodeIn: aProcess [
 	
 	"If we are are stepping into a quick method,
 	make sure that we step correctly over the first primitive bytecode"
-	| suspendedContext |
-	suspendedContext := aProcess suspendedContext.
-	(suspendedContext method isQuick and: [ suspendedContext pc == suspendedContext method initialPC ])
-		ifTrue: [ ^ suspendedContext updatePCForQuickPrimitiveRestart ].
+	| interruptedContext |
+	interruptedContext := aProcess suspendedContext.
+	(interruptedContext method isQuick and: [ interruptedContext pc == interruptedContext method initialPC ])
+		ifTrue: [ ^ interruptedContext updatePCForQuickPrimitiveRestart ].
 	
 	^ aProcess stepToSendOrReturn
 ]
@@ -102,7 +108,12 @@ FailSafeDebugSession >> stepInto: aContext [
 
 	"will this work?"
 
-	suspendedProcess step: aContext
+	(self isContextPostMortem: aContext) ifTrue: [ ^ self ].
+
+	suspendedProcess step: aContext.
+
+	self updateContextTo:
+		(self privateStepToFirstInterestingBytecodeIn: suspendedProcess)
 ]
 
 { #category : #actions }
