@@ -8,7 +8,8 @@ Class {
 		'code',
 		'stackTable',
 		'toolbar',
-		'inspector'
+		'inspector',
+		'unsavedCodeChanges'
 	],
 	#category : #'FailSafeDebugger-UI'
 }
@@ -41,6 +42,15 @@ FailSafeDebugger >> clear [
 	self fsDebugSession clear
 ]
 
+{ #category : #'updating - widgets' }
+FailSafeDebugger >> clearCode [
+	
+	code
+		clearInteractionModel;
+		clearSelection;
+		clearContent
+]
+
 { #category : #'initialize-release' }
 FailSafeDebugger >> close [
 
@@ -58,6 +68,8 @@ FailSafeDebugger >> context [
 FailSafeDebugger >> createCode [
 
 	^ self newCode
+		  interactionModel: SpCodeInteractionModel new;
+		  yourself
 ]
 
 { #category : #'presenter - code' }
@@ -227,6 +239,12 @@ FailSafeDebugger >> restartClicked [
 	self error: 'not yet implemented'
 ]
 
+{ #category : #'updating - actions' }
+FailSafeDebugger >> selectedCodeRangeForContext: aContext [
+
+	^ self fsDebugSession selectedCodeRangeForContext: aContext
+]
+
 { #category : #accessing }
 FailSafeDebugger >> selectedContext [
 
@@ -272,6 +290,13 @@ FailSafeDebugger >> stepThroughClicked [
 	self updateUI
 ]
 
+{ #category : #'presenter - code' }
+FailSafeDebugger >> unsavedCodeChanges [
+
+	^ unsavedCodeChanges ifNil: [ 
+		  unsavedCodeChanges := IdentityDictionary new ]
+]
+
 { #category : #updating }
 FailSafeDebugger >> updateCode [
 
@@ -281,9 +306,30 @@ FailSafeDebugger >> updateCode [
 { #category : #'presenter - code' }
 FailSafeDebugger >> updateCodeFromContext: aContext [
 
-	"not yet implemented"
+	| selectionInterval |
+	aContext ifNil: [ ^ self clearCode ].
+
+	selectionInterval := self selectedCodeRangeForContext: aContext.
+	aContext sourceCode = code text ifFalse: [ 
+		self updateSourceCodeFor: aContext ].
+	code beForContext: aContext.
+	code selectionInterval:
+		(selectionInterval last to: selectionInterval last - 1).
+	self
+		updateCodeTextSegmentDecoratorsIn: aContext
+		forInterval: selectionInterval
 
 	
+]
+
+{ #category : #'updating - widgets' }
+FailSafeDebugger >> updateCodeTextSegmentDecoratorsIn: aContext forInterval: selectionInterval [
+	
+	code removeAllTextSegmentDecorations.
+	
+	code addTextSegmentDecoration: (SpTextPresenterDecorator forHighlight
+		interval: (selectionInterval first to: selectionInterval last + 1);
+		yourself)
 ]
 
 { #category : #updating }
@@ -297,6 +343,16 @@ FailSafeDebugger >> updateInspectorFromContext: aContext [
 
 	inspector ifNotNil: [ 
 		inspector model: (FsDebuggerContext context: aContext) ]
+]
+
+{ #category : #'presenter - code' }
+FailSafeDebugger >> updateSourceCodeFor: aContext [
+
+	| codeText |
+	codeText := self unsavedCodeChanges
+		            at: aContext
+		            ifAbsent: [ aContext sourceCode ].
+	code text: codeText
 ]
 
 { #category : #accessing }

@@ -28,6 +28,12 @@ FailSafeDebugSession >> clear [
 FailSafeDebugSession >> isContextPostMortem: aContext [
 ]
 
+{ #category : #'updating - actions' }
+FailSafeDebugSession >> isLatestContext: aContext [
+
+	^ suspendedProcess suspendedContext == aContext
+]
+
 { #category : #accessing }
 FailSafeDebugSession >> name [
 
@@ -64,6 +70,17 @@ FailSafeDebugSession >> process: aProcess context: aContext [
 
 	suspendedProcess := aProcess.
 	suspendedContext ifNil: [ suspendedContext := aContext ]
+]
+
+{ #category : #'updating - actions' }
+FailSafeDebugSession >> selectedCodeRangeForContext: aContext [
+
+	"Answer the indices in the source code for the method corresponding to 
+	aContext's program counter value."
+
+	(aContext isNil or: [ aContext isDead ])
+		ifTrue: [ ^ 1 to: 0 ].
+	^ aContext pcRangeContextIsActive: (self isLatestContext: aContext)
 ]
 
 { #category : #accessing }
