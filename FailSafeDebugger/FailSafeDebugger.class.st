@@ -241,6 +241,12 @@ FailSafeDebugger >> proceedClicked [
 	self close
 ]
 
+{ #category : #actions }
+FailSafeDebugger >> recompileMethodTo: aString inContext: aContext notifying: aNotifyer [
+
+	"We have to discuss whether we want to write in the code presenter to recompile methods on the fly. In this case, all that's related to unsaved code changes could be removed"
+]
+
 { #category : #'presenter - code' }
 FailSafeDebugger >> recordUnsavedCodeChanges [
 
