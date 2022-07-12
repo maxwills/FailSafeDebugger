@@ -231,7 +231,8 @@ FailSafeDebugger >> printReceiverClassInContext: aContext [
 { #category : #actions }
 FailSafeDebugger >> proceedClicked [
 
-	self error: 'not yet implemented'
+	fsDebugSession proceedDebugSession.
+	self close
 ]
 
 { #category : #actions }

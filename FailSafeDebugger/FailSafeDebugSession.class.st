@@ -71,11 +71,37 @@ FailSafeDebugSession >> privateStepToFirstInterestingBytecodeIn: aProcess [
 	^ aProcess stepToSendOrReturn
 ]
 
+{ #category : #testing }
+FailSafeDebugSession >> proceedDebugSession [
+
+	"Proceed execution of the receiver's model, starting after the expression at 
+	which an interruption occurred."
+
+	"If the user of this session does not plan to reuse it, it should call 'self clean' "
+
+	Smalltalk okayToProceedEvenIfSpaceIsLow
+		ifFalse: [ ^ self ].
+	(self isContextPostMortem: suspendedContext)
+		ifTrue: [ ^ self ].
+	self resumeProcess.
+]
+
 { #category : #initialization }
 FailSafeDebugSession >> process: aProcess context: aContext [
 
 	suspendedProcess := aProcess.
 	suspendedContext ifNil: [ suspendedContext := aContext ]
+]
+
+{ #category : #testing }
+FailSafeDebugSession >> resumeProcess [
+
+	"Make sure the interrupted process is restored properly and restart the low space handler"
+
+	suspendedProcess resume.
+
+	"restart low space handler"
+	Smalltalk installLowSpaceWatcher
 ]
 
 { #category : #'updating - actions' }
