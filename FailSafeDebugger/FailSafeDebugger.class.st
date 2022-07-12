@@ -238,7 +238,10 @@ FailSafeDebugger >> proceedClicked [
 { #category : #actions }
 FailSafeDebugger >> restartClicked [
 
-	self error: 'not yet implemented'
+	fsDebugSession restartContext: self selectedContext.
+	self clearUnsavedCodeChanges.
+
+	self updateUI
 ]
 
 { #category : #'updating - actions' }

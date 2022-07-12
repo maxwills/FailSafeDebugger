@@ -34,10 +34,32 @@ FailSafeDebugSession >> isContextPostMortem: aContext [
 	^ (interruptedContext hasContext: aContext) not.
 ]
 
+{ #category : #'debug - execution' }
+FailSafeDebugSession >> isInterruptedContextATest [
+
+	^ (self isTestObject: suspendedContext receiver) and: [ 
+		  self
+			  isTestMethod: suspendedContext method
+			  of: suspendedContext receiver ]
+]
+
 { #category : #'updating - actions' }
 FailSafeDebugSession >> isLatestContext: aContext [
 
 	^ suspendedProcess suspendedContext == aContext
+]
+
+{ #category : #testing }
+FailSafeDebugSession >> isTestMethod: aCompiledMethod of: aTestCase [
+
+	^ aCompiledMethod selector = aTestCase selector
+]
+
+{ #category : #testing }
+FailSafeDebugSession >> isTestObject: anObject [
+
+	"I'm not sure this is the best way to doit because it creates a coupling with TestCase, but due that SUnit is part of the core I think it is not bad after all - Hernan'"
+	^ anObject isKindOf: TestCase
 ]
 
 { #category : #accessing }
@@ -50,6 +72,12 @@ FailSafeDebugSession >> name [
 FailSafeDebugSession >> name: anObject [
 
 	name := anObject
+]
+
+{ #category : #private }
+FailSafeDebugSession >> prepareTestToRunAgain [
+
+	suspendedContext receiver prepareToRunAgain
 ]
 
 { #category : #private }
@@ -91,6 +119,18 @@ FailSafeDebugSession >> process: aProcess context: aContext [
 
 	suspendedProcess := aProcess.
 	suspendedContext ifNil: [ suspendedContext := aContext ]
+]
+
+{ #category : #'debug - execution' }
+FailSafeDebugSession >> restartContext: aContext [
+	"Proceed from the initial state of selectedContext." 
+	"Closing now depends on a setting (RestartAlsoProceeds class variable) --> not supported in this version"
+
+	(self isContextPostMortem: aContext) ifTrue: [^ self].
+
+	"Issue 3015 - Hernan"
+	self isInterruptedContextATest ifTrue: [ self prepareTestToRunAgain ].
+	self unwindAndRestartToContext: aContext.	
 ]
 
 { #category : #testing }
@@ -181,6 +221,18 @@ FailSafeDebugSession >> stepThrough: aContext [
 FailSafeDebugSession >> suspendedContext [
 
 	^ suspendedContext
+]
+
+{ #category : #evaluating }
+FailSafeDebugSession >> unwindAndRestartToContext: aContext [
+
+	| ctx |
+	ctx := suspendedProcess popTo: aContext.
+	ctx == aContext ifTrue: [ "Only restart the process if the stack was unwind"
+		suspendedProcess restartTop.
+		self privateStepToFirstInterestingBytecodeIn: suspendedProcess ].
+	
+	self updateContextTo: aContext
 ]
 
 { #category : #accessing }
