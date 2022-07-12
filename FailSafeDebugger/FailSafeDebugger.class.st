@@ -51,6 +51,12 @@ FailSafeDebugger >> clearCode [
 		clearContent
 ]
 
+{ #category : #'presenter - code' }
+FailSafeDebugger >> clearUnsavedCodeChanges [
+
+	unsavedCodeChanges := IdentityDictionary new
+]
+
 { #category : #'initialize-release' }
 FailSafeDebugger >> close [
 
@@ -235,6 +241,18 @@ FailSafeDebugger >> proceedClicked [
 	self close
 ]
 
+{ #category : #'presenter - code' }
+FailSafeDebugger >> recordUnsavedCodeChanges [
+
+	|codeInteractionModel codeText|
+	codeInteractionModel := code interactionModel.
+	codeInteractionModel hasUnsavedCodeChanges ifFalse:[^self].
+	
+	codeText := code text asString.
+	self unsavedCodeChanges at: codeInteractionModel context put: codeText
+	
+]
+
 { #category : #actions }
 FailSafeDebugger >> restartClicked [
 
@@ -314,6 +332,7 @@ FailSafeDebugger >> updateCodeFromContext: aContext [
 	| selectionInterval |
 	aContext ifNil: [ ^ self clearCode ].
 
+	self recordUnsavedCodeChanges.
 	selectionInterval := self selectedCodeRangeForContext: aContext.
 	aContext sourceCode = code text ifFalse: [ 
 		self updateSourceCodeFor: aContext ].
